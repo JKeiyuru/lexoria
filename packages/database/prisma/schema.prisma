@@ -1,0 +1,301 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── USERS & AUTH ────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  username      String    @unique
+  passwordHash  String?
+  googleId      String?   @unique
+  age           Int?
+  avatarConfig  Json      @default("{}")
+  tier          Tier      @default(FREE)
+  totalXP       Int       @default(0)
+  level         Int       @default(1)
+  streakDays    Int       @default(0)
+  lastActiveAt  DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  subjectXP         UserSubjectXP[]
+  progress          UserProgress[]
+  achievements      UserAchievement[]
+  guildMemberships  GuildMember[]
+  helpPosts         HelpPost[]
+  helpAnswers       HelpAnswer[]
+  subscription      Subscription?
+  refreshTokens     RefreshToken[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("refresh_tokens")
+}
+
+enum Tier {
+  FREE
+  VIP
+}
+
+// ─── SUBJECTS & COURSES ──────────────────────────────────────────
+
+model Subject {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String
+  iconUrl     String?
+  color       String   @default("#2E86AB")
+  storyWorld  String
+  isFree      Boolean  @default(false)
+  orderIndex  Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  seasons     Season[]
+  userXP      UserSubjectXP[]
+
+  @@map("subjects")
+}
+
+model Season {
+  id          String   @id @default(cuid())
+  subjectId   String
+  subject     Subject  @relation(fields: [subjectId], references: [id])
+  title       String
+  description String
+  storyArc    String
+  orderIndex  Int      @default(0)
+  isFree      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  chapters    Chapter[]
+
+  @@map("seasons")
+}
+
+model Chapter {
+  id               String   @id @default(cuid())
+  seasonId         String
+  season           Season   @relation(fields: [seasonId], references: [id])
+  title            String
+  conceptTaught    String
+  storyContent     Json
+  technicalContent Json
+  orderIndex       Int      @default(0)
+  xpReward         Int      @default(50)
+  isFree           Boolean  @default(false)
+  createdAt        DateTime @default(now())
+
+  challenges  Challenge[]
+  progress    UserProgress[]
+  helpPosts   HelpPost[]
+
+  @@map("chapters")
+}
+
+model Challenge {
+  id           String        @id @default(cuid())
+  chapterId    String
+  chapter      Chapter       @relation(fields: [chapterId], references: [id])
+  title        String
+  description  String
+  type         ChallengeType @default(MINI)
+  prompt       String
+  starterCode  String        @default("")
+  solution     String
+  testCases    Json
+  xpReward     Int           @default(25)
+  orderIndex   Int           @default(0)
+  createdAt    DateTime      @default(now())
+
+  attempts     ChallengeAttempt[]
+
+  @@map("challenges")
+}
+
+enum ChallengeType {
+  MINI
+  MISSION
+  BOSS
+}
+
+// ─── PROGRESS & XP ───────────────────────────────────────────────
+
+model UserSubjectXP {
+  id        String  @id @default(cuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subjectId String
+  subject   Subject @relation(fields: [subjectId], references: [id])
+  xp        Int     @default(0)
+  level     Int     @default(1)
+
+  @@unique([userId, subjectId])
+  @@map("user_subject_xp")
+}
+
+model UserProgress {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chapterId   String
+  chapter     Chapter  @relation(fields: [chapterId], references: [id])
+  completedAt DateTime @default(now())
+  mode        Mode     @default(STORY)
+  score       Int      @default(0)
+
+  @@unique([userId, chapterId])
+  @@map("user_progress")
+}
+
+model ChallengeAttempt {
+  id          String    @id @default(cuid())
+  userId      String
+  challengeId String
+  challenge   Challenge @relation(fields: [challengeId], references: [id])
+  code        String
+  passed      Boolean   @default(false)
+  output      String?
+  xpEarned    Int       @default(0)
+  attemptedAt DateTime  @default(now())
+
+  @@map("challenge_attempts")
+}
+
+enum Mode {
+  STORY
+  TECHNICAL
+}
+
+// ─── ACHIEVEMENTS ─────────────────────────────────────────────────
+
+model Achievement {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String
+  badgeUrl    String?
+  xpReward    Int      @default(0)
+  condition   Json
+  createdAt   DateTime @default(now())
+
+  users       UserAchievement[]
+
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievementId String
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+  unlockedAt    DateTime    @default(now())
+
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+// ─── GUILDS & SOCIAL ──────────────────────────────────────────────
+
+model Guild {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  emblemUrl   String?
+  totalXP     Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  members     GuildMember[]
+
+  @@map("guilds")
+}
+
+model GuildMember {
+  id       String    @id @default(cuid())
+  guildId  String
+  guild    Guild     @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role     GuildRole @default(MEMBER)
+  joinedAt DateTime  @default(now())
+
+  @@unique([guildId, userId])
+  @@map("guild_members")
+}
+
+enum GuildRole {
+  LEADER
+  OFFICER
+  MEMBER
+}
+
+model HelpPost {
+  id          String     @id @default(cuid())
+  userId      String
+  user        User       @relation(fields: [userId], references: [id])
+  chapterId   String?
+  chapter     Chapter?   @relation(fields: [chapterId], references: [id])
+  title       String
+  body        String
+  voteCount   Int        @default(0)
+  resolvedAt  DateTime?
+  createdAt   DateTime   @default(now())
+
+  answers     HelpAnswer[]
+
+  @@map("help_posts")
+}
+
+model HelpAnswer {
+  id         String   @id @default(cuid())
+  postId     String
+  post       HelpPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  body       String
+  voteCount  Int      @default(0)
+  isAccepted Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@map("help_answers")
+}
+
+// ─── SUBSCRIPTIONS ────────────────────────────────────────────────
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  userId               String             @unique
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stripeCustomerId     String?            @unique
+  stripeSubscriptionId String?            @unique
+  status               SubscriptionStatus @default(INACTIVE)
+  currentPeriodEnd     DateTime?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  @@map("subscriptions")
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
+  PAST_DUE
+  CANCELLED
+}

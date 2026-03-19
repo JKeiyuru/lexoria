@@ -1,0 +1,29 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "lint": {
+      "dependsOn": ["^lint"]
+    }
+  }
+}
+```
+
+---
+
+**Create `.gitignore`** in the root:
+```
+node_modules
+dist
+.env
+.env.local
+.turbo
+*.log
+.DS_Store

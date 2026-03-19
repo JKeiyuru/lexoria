@@ -1,0 +1,37 @@
+import 'dotenv/config'
+import Fastify from 'fastify'
+import cors from '@fastify/cors'
+import jwt from '@fastify/jwt'
+import cookie from '@fastify/cookie'
+
+const app = Fastify({ logger: true })
+
+// ── Plugins ──────────────────────────────────────────────────────
+app.register(cors, {
+  origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'],
+  credentials: true,
+})
+
+app.register(jwt, {
+  secret: process.env.JWT_SECRET || 'lexoria-dev-secret-change-in-production',
+})
+
+app.register(cookie)
+
+// ── Health check ──────────────────────────────────────────────────
+app.get('/health', async () => {
+  return { status: 'ok', service: 'Lexoria API', timestamp: new Date().toISOString() }
+})
+
+// ── Start ─────────────────────────────────────────────────────────
+const start = async () => {
+  try {
+    await app.listen({ port: Number(process.env.PORT) || 3001, host: '0.0.0.0' })
+    console.log('🚀 Lexoria API running on port 3001')
+  } catch (err) {
+    app.log.error(err)
+    process.exit(1)
+  }
+}
+
+start()
