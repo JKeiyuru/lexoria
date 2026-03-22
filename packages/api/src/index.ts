@@ -5,6 +5,7 @@ import jwt from '@fastify/jwt'
 import cookie from '@fastify/cookie'
 import { authRoutes } from './routes/auth.routes'
 import { subjectRoutes } from './routes/subjects.routes'
+import { executionRoutes } from './routes/execution.routes'
 
 const app = Fastify({ logger: true })
 
@@ -23,6 +24,7 @@ app.register(cookie)
 // ── Routes ────────────────────────────────────────────────────────
 app.register(authRoutes, { prefix: '/auth' })
 app.register(subjectRoutes, { prefix: '/subjects' })
+app.register(executionRoutes, { prefix: '/execute' })
 
 // ── Health check ──────────────────────────────────────────────────
 app.get('/health', async () => {

@@ -44,6 +44,9 @@ importers:
       fastify:
         specifier: ^4.28.0
         version: 4.29.1
+      vm2:
+        specifier: ^3.10.5
+        version: 3.10.5
       zod:
         specifier: ^3.23.8
         version: 3.25.76
@@ -909,6 +912,11 @@ packages:
 
   v8-compile-cache-lib@3.0.1:
     resolution: {integrity: sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==}
+
+  vm2@3.10.5:
+    resolution: {integrity: sha512-3P/2QDccVFBcujfCOeP8vVNuGfuBJHEuvGR8eMmI10p/iwLL2UwF5PDaNaoOS2pRGQEDmJRyeEcc8kmm2Z59RA==}
+    engines: {node: '>=6.0'}
+    hasBin: true
 
   which@2.0.2:
     resolution: {integrity: sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==}
@@ -1787,6 +1795,11 @@ snapshots:
       punycode: 2.3.1
 
   v8-compile-cache-lib@3.0.1: {}
+
+  vm2@3.10.5:
+    dependencies:
+      acorn: 8.16.0
+      acorn-walk: 8.3.5
 
   which@2.0.2:
     dependencies:
