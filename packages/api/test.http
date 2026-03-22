@@ -27,3 +27,33 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbW4xd
 
 ### Logout
 POST http://localhost:3001/auth/logout
+
+### Get all subjects (needs auth token)
+GET http://localhost:3001/subjects
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbW4xdHpmazMwMDAweDRjaTQyc3JxOTJ3IiwiZW1haWwiOiJ0ZXN0QGxleG9yaWEuY29tIiwiaWF0IjoxNzc0MTkwNDE0LCJleHAiOjE3NzQxOTEzMTR9.of-hWC_EVg_Z81rW8j070kv8Tm2N6zC75WLhbs2FeMY
+
+### Get JavaScript subject
+GET http://localhost:3001/subjects/javascript
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbW4xdHpmazMwMDAweDRjaTQyc3JxOTJ3IiwiZW1haWwiOiJ0ZXN0QGxleG9yaWEuY29tIiwiaWF0IjoxNzc0MTkwNDE0LCJleHAiOjE3NzQxOTEzMTR9.of-hWC_EVg_Z81rW8j070kv8Tm2N6zC75WLhbs2FeMY
+
+### Get Season 1
+GET http://localhost:3001/subjects/season/season-js-1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbW4xdHpmazMwMDAweDRjaTQyc3JxOTJ3IiwiZW1haWwiOiJ0ZXN0QGxleG9yaWEuY29tIiwiaWF0IjoxNzc0MTkwODM1LCJleHAiOjE3NzQxOTE3MzV9.Wc1kj9AMyUBYl9UifCBKf450nFz6X_WNmW2exqpnsOQ
+
+### Get Chapter 1
+GET http://localhost:3001/subjects/chapter/ch-js-1-1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbW4xdHpmazMwMDAweDRjaTQyc3JxOTJ3IiwiZW1haWwiOiJ0ZXN0QGxleG9yaWEuY29tIiwiaWF0IjoxNzc0MTg4NzA0LCJleHAiOjE3NzQxODk2MDR9.qvfFRSEjIL1ycacu341KaGjJJxC6kfl7oqWoDxJvX54
+
+### Complete Chapter 1 (awards 100 XP)
+POST http://localhost:3001/subjects/chapter/ch-js-1-1/complete
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbW4xdHpmazMwMDAweDRjaTQyc3JxOTJ3IiwiZW1haWwiOiJ0ZXN0QGxleG9yaWEuY29tIiwiaWF0IjoxNzc0MTg4NzA0LCJleHAiOjE3NzQxODk2MDR9.qvfFRSEjIL1ycacu341KaGjJJxC6kfl7oqWoDxJvX54
+Content-Type: application/json
+
+{
+  "mode": "STORY",
+  "score": 100
+}
+
+### Check your XP went up
+GET http://localhost:3001/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbW4xdHpmazMwMDAweDRjaTQyc3JxOTJ3IiwiZW1haWwiOiJ0ZXN0QGxleG9yaWEuY29tIiwiaWF0IjoxNzc0MTg4NzA0LCJleHAiOjE3NzQxODk2MDR9.qvfFRSEjIL1ycacu341KaGjJJxC6kfl7oqWoDxJvX54
