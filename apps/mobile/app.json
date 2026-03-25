@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "Lexoria",
+    "slug": "lexoria",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "scheme": "lexoria",
+    "splash": {
+      "backgroundColor": "#0F1923"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store"
+    ],
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0F1923"
+      },
+      "package": "com.lexoria.app"
+    },
+    "ios": {
+      "bundleIdentifier": "com.lexoria.app",
+      "supportsTablet": false
+    }
+  }
+}
