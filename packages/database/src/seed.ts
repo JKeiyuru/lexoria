@@ -502,6 +502,39 @@ async function main() {
     },
   })
 
+  await prisma.achievement.upsert({
+    where: { name: 'Level 5 Reached' },
+    update: {},
+    create: {
+      name: 'Level 5 Reached',
+      description: 'Reach Level 5 on the platform',
+      xpReward: 100,
+      condition: { type: 'level_reached', level: 5 },
+    },
+  })
+
+  await prisma.achievement.upsert({
+    where: { name: 'XP Collector' },
+    update: {},
+    create: {
+      name: 'XP Collector',
+      description: 'Earn 500 XP in total',
+      xpReward: 75,
+      condition: { type: 'xp_earned', amount: 500 },
+    },
+  })
+
+  await prisma.achievement.upsert({
+    where: { name: 'Persistent Scholar' },
+    update: {},
+    create: {
+      name: 'Persistent Scholar',
+      description: 'Complete 3 chapters',
+      xpReward: 80,
+      condition: { type: 'chapters_completed', count: 3 },
+    },
+  })
+
   console.log('✅ Achievements created')
   console.log('\n🎉 Lexoria database seeded successfully!')
   console.log('   6 subjects | 1 season | 5 chapters | challenges | 4 achievements')

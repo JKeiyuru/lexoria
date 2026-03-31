@@ -1,6 +1,7 @@
 import { NodeVM, VMScript } from 'vm2'
 import { prisma } from '@lexoria/database'
 import { calculateLevel } from '../utils/xp'
+import { checkAndAwardAchievements } from './achievements.service'
 
 const EXECUTION_TIMEOUT_MS = 5000
 const MAX_OUTPUT_LINES = 200
@@ -135,6 +136,8 @@ export const submitChallenge = async (
       update: { xp: { increment: xpEarned } },
     })
 
+    const newAchievements = await checkAndAwardAchievements(userId)
+
     return {
       passed: true,
       results,
@@ -144,6 +147,7 @@ export const submitChallenge = async (
       newTotalXP: updatedUser.totalXP + xpEarned,
       levelUp: newLevel !== updatedUser.level,
       newLevel,
+      newAchievements,
     }
   }
 

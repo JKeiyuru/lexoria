@@ -1,5 +1,6 @@
 import { prisma } from '@lexoria/database'
 import { calculateLevel } from '../utils/xp'
+import { checkAndAwardAchievements } from './achievements.service'
 
 export const completeChapter = async (
   userId: string,
@@ -72,6 +73,18 @@ export const completeChapter = async (
       where: { id: membership.guildId },
       data: { totalXP: { increment: xpEarned } },
     })
+  }
+
+  // Check for newly unlocked achievements
+  const newAchievements = await checkAndAwardAchievements(userId)
+
+  return {
+    alreadyCompleted: false,
+    xpEarned,
+    newTotalXP: updatedUser.totalXP + xpEarned,
+    newLevel,
+    levelUp: newLevel !== updatedUser.level,
+    newAchievements,
   }
 
   return {

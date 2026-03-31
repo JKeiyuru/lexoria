@@ -1,8 +1,30 @@
-import { Tabs } from 'expo-router'
+import { useEffect } from 'react'
+import { View, ActivityIndicator } from 'react-native'
+import { Tabs, useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
+import { useAuthStore } from '../../store/auth.store'
 import { Colors } from '../../constants/colors'
+import React from 'react'
 
 export default function TabsLayout() {
+  const { user, isLoading, isAuthenticated } = useAuthStore()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.replace('/(auth)/welcome')
+    }
+  }, [isLoading, isAuthenticated])
+
+  // Show loader while user is being fetched
+  if (isLoading || !user) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.background }}>
+        <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
+    )
+  }
+
   return (
     <Tabs
       screenOptions={{
@@ -34,6 +56,15 @@ export default function TabsLayout() {
           title: 'Subjects',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="book" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="achievements"
+        options={{
+          title: 'Achievements',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="trophy" size={size} color={color} />
           ),
         }}
       />

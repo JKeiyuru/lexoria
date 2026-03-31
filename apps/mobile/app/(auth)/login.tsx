@@ -8,6 +8,7 @@ import { useRouter } from 'expo-router'
 import Toast from 'react-native-toast-message'
 import { useAuthStore } from '../../store/auth.store'
 import { Colors } from '../../constants/colors'
+import React from 'react'
 
 export default function LoginScreen() {
   const router = useRouter()

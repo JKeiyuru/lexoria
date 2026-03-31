@@ -31,21 +31,53 @@ interface RegisterData {
   age?: number
 }
 
+const mapUser = (raw: any): User => ({
+  id: raw.id,
+  email: raw.email,
+  username: raw.username,
+  tier: raw.tier ?? 'FREE',
+  level: raw.level ?? 1,
+  totalXP: raw.totalXP ?? 0,
+  avatarConfig: raw.avatarConfig ?? {},
+  streakDays: raw.streakDays ?? 0,
+})
+
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isLoading: true,
   isAuthenticated: false,
 
   login: async (email, password) => {
+  try {
     const res = await api.post('/auth/login', { email, password })
-    await SecureStore.setItemAsync('accessToken', res.data.accessToken)
-    set({ user: res.data.user, isAuthenticated: true, isLoading: false })
-  },
+    console.log('LOGIN RESPONSE:', JSON.stringify(res.data))
+    const token = String(res.data.accessToken)
+    await SecureStore.setItemAsync('accessToken', token)
+    set({
+      user: mapUser(res.data.user),
+      isAuthenticated: true,
+      isLoading: false,
+    })
+  } catch (err: any) {
+    console.error('LOGIN ERROR:', JSON.stringify(err?.response?.data || err?.message || err))
+    throw err
+  }
+},
 
   register: async (data) => {
-    const res = await api.post('/auth/register', data)
-    await SecureStore.setItemAsync('accessToken', res.data.accessToken)
-    set({ user: res.data.user, isAuthenticated: true, isLoading: false })
+    try {
+      const res = await api.post('/auth/register', data)
+      const token = String(res.data.accessToken)
+      await SecureStore.setItemAsync('accessToken', token)
+      set({
+        user: mapUser(res.data.user),
+        isAuthenticated: true,
+        isLoading: false,
+      })
+    } catch (err: any) {
+      console.error('REGISTER ERROR:', JSON.stringify(err?.response?.data || err?.message || err))
+      throw err
+    }
   },
 
   logout: async () => {
@@ -54,34 +86,26 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ user: null, isAuthenticated: false, isLoading: false })
   },
 
-  loadUser: async () => {
-    try {
-      const token = await SecureStore.getItemAsync('accessToken')
-      if (!token) {
-        set({ isLoading: false, isAuthenticated: false })
-        return
-      }
-      const res = await api.get('/auth/me')
-      const user = res.data.user
-      set({
-        user: {
-          id: user.id,
-          email: user.email,
-          username: user.username,
-          tier: user.tier,
-          level: user.level,
-          totalXP: user.totalXP,
-          avatarConfig: user.avatarConfig ?? {},
-          streakDays: user.streakDays ?? 0,
-        },
-        isAuthenticated: true,
-        isLoading: false,
-      })
-    } catch {
-      await SecureStore.deleteItemAsync('accessToken')
-      set({ isLoading: false, isAuthenticated: false, user: null })
+ loadUser: async () => {
+  try {
+    const token = await SecureStore.getItemAsync('accessToken')
+    if (!token) {
+      set({ isLoading: false, isAuthenticated: false })
+      return
     }
-  },
+    const res = await api.get('/auth/me')
+    console.log('LOAD USER RESPONSE:', JSON.stringify(res.data))
+    set({
+      user: mapUser(res.data.user),
+      isAuthenticated: true,
+      isLoading: false,
+    })
+  } catch (err) {
+    console.error('LOAD USER ERROR:', err)
+    await SecureStore.deleteItemAsync('accessToken')
+    set({ isLoading: false, isAuthenticated: false, user: null })
+  }
+},
 
   updateUser: (data) =>
     set((state) => ({

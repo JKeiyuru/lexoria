@@ -28,6 +28,8 @@ export function ChallengePanel({ challenge, onClose, onPass }: Props) {
   const [submitting, setSubmitting] = useState(false)
   const [result, setResult] = useState<any>(null)
   const [code, setCode] = useState(challenge.starterCode || '')
+  const [hint, setHint] = useState<{ mentorName: string; hint: string } | null>(null)
+const [loadingHint, setLoadingHint] = useState(false)
 
   const handleSubmit = async () => {
     if (!code.trim()) return
@@ -56,6 +58,25 @@ export function ChallengePanel({ challenge, onClose, onPass }: Props) {
       setSubmitting(false)
     }
   }
+
+
+  const handleGetHint = async () => {
+  setLoadingHint(true)
+  setHint(null)
+  try {
+    const res = await api.post('/mentor/hint', {
+      challengeId: challenge.id,
+      userCode: code,
+      errorMessage: result?.error || '',
+      mode: 'STORY',
+    })
+    setHint(res.data)
+  } catch {
+    // Mentor unavailable — fail silently
+  } finally {
+    setLoadingHint(false)
+  }
+}
 
   return (
     <View style={styles.container}>
@@ -119,6 +140,26 @@ export function ChallengePanel({ challenge, onClose, onPass }: Props) {
           </View>
         )}
 
+        {/* Mentor hint */}
+<TouchableOpacity
+  style={styles.hintBtn}
+  onPress={handleGetHint}
+  disabled={loadingHint}
+>
+  {loadingHint ? (
+    <ActivityIndicator size="small" color={Colors.accentPurple} />
+  ) : (
+    <Text style={styles.hintBtnText}>💡 Ask your Mentor for a hint</Text>
+  )}
+</TouchableOpacity>
+
+{hint && (
+  <View style={styles.hintBlock}>
+    <Text style={styles.hintMentor}>{hint.mentorName} says:</Text>
+    <Text style={styles.hintText}>{hint.hint}</Text>
+  </View>
+)}
+
         {/* Submit button */}
         <TouchableOpacity
           style={[styles.submitBtn, submitting && styles.submitBtnDisabled, challenge.passed && styles.submitBtnPassed]}
@@ -139,6 +180,20 @@ export function ChallengePanel({ challenge, onClose, onPass }: Props) {
 }
 
 const styles = StyleSheet.create({
+
+  hintBtn: {
+  borderWidth: 1, borderColor: Colors.accentPurple + '66',
+  borderRadius: 12, padding: 14, alignItems: 'center',
+  marginBottom: 12, backgroundColor: Colors.accentPurple + '11',
+},
+hintBtnText: { color: Colors.accentPurple, fontWeight: '600', fontSize: 14 },
+hintBlock: {
+  backgroundColor: Colors.surface, borderRadius: 12,
+  padding: 16, marginBottom: 12,
+  borderWidth: 1, borderColor: Colors.accentPurple + '44',
+},
+hintMentor: { color: Colors.accentPurple, fontWeight: '700', fontSize: 12, marginBottom: 8, textTransform: 'uppercase', letterSpacing: 1 },
+hintText: { color: Colors.textPrimary, fontSize: 14, lineHeight: 22 },
   container: { flex: 1, backgroundColor: Colors.background },
   header: {
     flexDirection: 'row', alignItems: 'center',

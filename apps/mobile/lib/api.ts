@@ -1,22 +1,26 @@
 import axios from 'axios'
 import * as SecureStore from 'expo-secure-store'
 
-const API_URL = 'http://192.168.8.16:8081'
-// Replace YOUR_LOCAL_IP with your actual local IP
-// Find it by running: ipconfig (Windows) — look for IPv4 Address
+// Your computer's local IP — must be the same network as your phone
+// Expo is on 192.168.8.37 so your API should be on the same IP
+const API_URL = 'http://192.168.8.37:3001'
 
 export const api = axios.create({
   baseURL: API_URL,
   timeout: 15000,
-  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 })
 
 // Attach access token to every request
 api.interceptors.request.use(async (config) => {
-  const token = await SecureStore.getItemAsync('accessToken')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
+  try {
+    const token = await SecureStore.getItemAsync('accessToken')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+  } catch {}
   return config
 })
 
@@ -28,8 +32,12 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !original._retry) {
       original._retry = true
       try {
-        const res = await axios.post(`${API_URL}/auth/refresh`, {}, { withCredentials: true })
-        const newToken = res.data.accessToken
+        const res = await axios.post(
+          `${API_URL}/auth/refresh`,
+          {},
+          { withCredentials: true }
+        )
+        const newToken = String(res.data.accessToken)
         await SecureStore.setItemAsync('accessToken', newToken)
         original.headers.Authorization = `Bearer ${newToken}`
         return api(original)

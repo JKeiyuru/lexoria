@@ -3,6 +3,7 @@ import { View, ActivityIndicator } from 'react-native'
 import { useRouter, useSegments } from 'expo-router'
 import { useAuthStore } from '../store/auth.store'
 import { Colors } from '../constants/colors'
+import React from 'react'
 
 export default function Index() {
   const { isAuthenticated, isLoading } = useAuthStore()

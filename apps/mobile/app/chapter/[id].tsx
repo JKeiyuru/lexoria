@@ -10,6 +10,8 @@ import { useAuthStore } from '../../store/auth.store'
 import { Colors } from '../../constants/colors'
 import { CodeEditor } from '../../components/editor/CodeEditor'
 import { ChallengePanel } from '../../components/course/ChallengePanel'
+import { XPToast } from '../../components/ui/XPToast'
+import { AchievementToast } from '../../components/ui/AchievementToast'
 import React from 'react'
 
 export default function ChapterScreen() {
@@ -27,28 +29,35 @@ export default function ChapterScreen() {
     queryFn: () => api.get(`/subjects/chapter/${id}`).then((r) => r.data.chapter),
   })
 
+
+  const [xpToast, setXpToast] = useState<{ xp: number; levelUp?: boolean; newLevel?: number } | null>(null)
+const [achievementToast, setAchievementToast] = useState<any>(null)
+
+
   const handleCompleteChapter = async () => {
-    if (!data || data.completed) return
-    setCompleting(true)
-    try {
-      const res = await api.post(`/subjects/chapter/${id}/complete`, { mode, score: 100 })
-      if (res.data.xpEarned > 0) {
-        updateUser({ totalXP: res.data.newTotalXP, level: res.data.newLevel })
-        Alert.alert(
-          '🎉 Chapter Complete!',
-          `+${res.data.xpEarned} XP earned${res.data.levelUp ? `\n⬆️ Level Up! You are now Level ${res.data.newLevel}!` : ''}`,
-          [{ text: 'Continue', onPress: () => router.back() }]
-        )
-      } else {
-        router.back()
+  if (!data || data.completed) return
+  setCompleting(true)
+  try {
+    const res = await api.post(`/subjects/chapter/${id}/complete`, { mode, score: 100 })
+    if (res.data.xpEarned > 0) {
+      updateUser({ totalXP: res.data.newTotalXP, level: res.data.newLevel })
+      setXpToast({
+        xp: res.data.xpEarned,
+        levelUp: res.data.levelUp,
+        newLevel: res.data.newLevel,
+      })
+      // Show achievement toast if any unlocked
+      if (res.data.newAchievements?.length > 0) {
+        setTimeout(() => setAchievementToast(res.data.newAchievements[0]), 1000)
       }
-      queryClient.invalidateQueries({ queryKey: ['chapter', id] })
-    } catch (err) {
-      Alert.alert('Error', 'Could not complete chapter. Try again.')
-    } finally {
-      setCompleting(false)
     }
+    queryClient.invalidateQueries({ queryKey: ['chapter', id] })
+  } catch {
+    Alert.alert('Error', 'Could not complete chapter. Try again.')
+  } finally {
+    setCompleting(false)
   }
+}
 
   if (isLoading) {
     return (
@@ -82,6 +91,8 @@ export default function ChapterScreen() {
       />
     )
   }
+
+  
 
   return (
     <View style={styles.container}>
@@ -185,6 +196,17 @@ export default function ChapterScreen() {
           </View>
         )}
       </ScrollView>
+      <XPToast
+        xp={xpToast?.xp ?? 0}
+        levelUp={xpToast?.levelUp}
+        newLevel={xpToast?.newLevel}
+        visible={!!xpToast}
+        onHide={() => setXpToast(null)}
+      />
+      <AchievementToast
+        achievement={achievementToast}
+        onHide={() => setAchievementToast(null)}
+      />
     </View>
   )
 }
