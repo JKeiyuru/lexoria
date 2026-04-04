@@ -30,6 +30,8 @@ model User {
   achievements     UserAchievement[]
   progress         UserProgress[]
   subjectXP        UserSubjectXP[]
+  postVotes      PostVote[]
+  answerVotes    AnswerVote[]
 
   @@map("users")
 }
@@ -218,6 +220,7 @@ model HelpPost {
   answers    HelpAnswer[]
   chapter    Chapter?     @relation(fields: [chapterId], references: [id])
   user       User         @relation(fields: [userId], references: [id])
+  votes       PostVote[]
 
   @@map("help_posts")
 }
@@ -232,6 +235,7 @@ model HelpAnswer {
   createdAt  DateTime @default(now())
   post       HelpPost @relation(fields: [postId], references: [id], onDelete: Cascade)
   user       User     @relation(fields: [userId], references: [id])
+  votes       AnswerVote[]
 
   @@map("help_answers")
 }
@@ -248,6 +252,30 @@ model Subscription {
   user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("subscriptions")
+}
+
+model PostVote {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      HelpPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, postId])
+  @@map("post_votes")
+}
+
+model AnswerVote {
+  id        String     @id @default(cuid())
+  userId    String
+  answerId  String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  answer    HelpAnswer @relation(fields: [answerId], references: [id], onDelete: Cascade)
+  createdAt DateTime   @default(now())
+
+  @@unique([userId, answerId])
+  @@map("answer_votes")
 }
 
 enum Tier {

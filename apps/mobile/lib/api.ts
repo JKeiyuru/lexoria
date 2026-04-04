@@ -1,9 +1,26 @@
 import axios from 'axios'
 import * as SecureStore from 'expo-secure-store'
+import Constants from 'expo-constants'
 
-// Your computer's local IP — must be the same network as your phone
-// Expo is on 192.168.8.37 so your API should be on the same IP
-const API_URL = 'http://192.168.8.37:3001'
+// Dynamically derive API URL from Expo's host
+// This means it always matches your current IP — no more manual updates
+const getApiUrl = (): string => {
+  const expoHost =
+    Constants.expoConfig?.hostUri ||
+    Constants.manifest?.debuggerHost ||
+    Constants.manifest2?.extra?.expoGo?.debuggerHost
+
+  if (expoHost) {
+    const host = expoHost.split(':')[0]
+    return `http://${host}:3001`
+  }
+
+  // Fallback for production builds
+  return 'http://localhost:3001'
+}
+
+const API_URL = getApiUrl()
+console.log('API URL:', API_URL)
 
 export const api = axios.create({
   baseURL: API_URL,

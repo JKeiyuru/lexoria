@@ -8,6 +8,8 @@ import { subjectRoutes } from './routes/subjects.routes'
 import { executionRoutes } from './routes/execution.routes'
 import { mentorRoutes } from './routes/mentor.routes'
 import { gamificationRoutes } from './routes/gamification.routes'
+import { guildRoutes } from './routes/guilds.routes'
+import { helpboardRoutes } from './routes/helpboard.routes'
 
 const app = Fastify({ logger: true })
 
@@ -29,6 +31,8 @@ app.register(subjectRoutes, { prefix: '/subjects' })
 app.register(executionRoutes, { prefix: '/execute' })
 app.register(mentorRoutes, { prefix: '/mentor' })
 app.register(gamificationRoutes, { prefix: '/gamification' })
+app.register(guildRoutes, { prefix: '/guilds' })
+app.register(helpboardRoutes, { prefix: '/help' })
 
 // ── Health check ──────────────────────────────────────────────────
 app.get('/health', async () => {

@@ -59,17 +59,17 @@ export default function ProfileScreen() {
       {/* Menu */}
       <View style={styles.menu}>
         {[
-          { icon: '🏆', label: 'Achievements' },
-          { icon: '⚔️', label: 'My Guild' },
-          { icon: '❓', label: 'Help Board' },
-          { icon: '⚙️', label: 'Settings' },
-        ].map((item) => (
-          <TouchableOpacity key={item.label} style={styles.menuItem}>
-            <Text style={styles.menuIcon}>{item.icon}</Text>
-            <Text style={styles.menuLabel}>{item.label}</Text>
-            <Text style={styles.menuArrow}>→</Text>
-          </TouchableOpacity>
-        ))}
+  { icon: '🏆', label: 'Achievements', onPress: () => router.push('/(tabs)/achievements') },
+  { icon: '⚔️', label: 'My Guild', onPress: () => router.push('/guild') },
+  { icon: '❓', label: 'Help Board', onPress: () => router.push('/helpboard') },
+  { icon: '⚙️', label: 'Settings', onPress: () => {} },
+].map((item) => (
+  <TouchableOpacity key={item.label} style={styles.menuItem} onPress={item.onPress}>
+    <Text style={styles.menuIcon}>{item.icon}</Text>
+    <Text style={styles.menuLabel}>{item.label}</Text>
+    <Text style={styles.menuArrow}>→</Text>
+  </TouchableOpacity>
+))}
       </View>
 
       {user.tier === 'FREE' && (
