@@ -34,8 +34,9 @@ export default function RootLayout() {
           <Stack.Screen name="subject/[slug]" options={{ headerShown: false }} />
           <Stack.Screen name="chapter/[id]" options={{ headerShown: false }} />
           <Stack.Screen name="helppost/[id]" options={{ headerShown: false }} />
-<Stack.Screen name="guild" options={{ headerShown: false }} />
-<Stack.Screen name="helpboard" options={{ headerShown: false }} />
+          <Stack.Screen name="guild" options={{ headerShown: false }} />
+          <Stack.Screen name="helpboard" options={{ headerShown: false }} />
+          <Stack.Screen name="upgrade" options={{ headerShown: false }} />
         </Stack>
         <Toast />
       </QueryClientProvider>

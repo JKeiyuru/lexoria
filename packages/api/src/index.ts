@@ -10,8 +10,27 @@ import { mentorRoutes } from './routes/mentor.routes'
 import { gamificationRoutes } from './routes/gamification.routes'
 import { guildRoutes } from './routes/guilds.routes'
 import { helpboardRoutes } from './routes/helpboard.routes'
+import { paymentRoutes } from './routes/payments.routes'
 
-const app = Fastify({ logger: true })
+const app = Fastify({
+  logger: true,
+  bodyLimit: 1048576,
+})
+
+// Add raw body support for Stripe webhooks
+app.addContentTypeParser(
+  'application/json',
+  { parseAs: 'buffer' },
+  (req, body, done) => {
+    try {
+      ;(req as any).rawBody = body
+      const json = JSON.parse(body.toString())
+      done(null, json)
+    } catch (err: any) {
+      done(err, undefined)
+    }
+  }
+)
 
 // ── Plugins ──────────────────────────────────────────────────────
 app.register(cors, {
@@ -33,6 +52,7 @@ app.register(mentorRoutes, { prefix: '/mentor' })
 app.register(gamificationRoutes, { prefix: '/gamification' })
 app.register(guildRoutes, { prefix: '/guilds' })
 app.register(helpboardRoutes, { prefix: '/help' })
+app.register(paymentRoutes, { prefix: '/payments' })
 
 // ── Health check ──────────────────────────────────────────────────
 app.get('/health', async () => {

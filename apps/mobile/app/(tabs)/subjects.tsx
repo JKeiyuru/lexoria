@@ -95,7 +95,8 @@ export default function SubjectsScreen() {
           <Text style={styles.upgradeDesc}>
             Upgrade to VIP to access Mathematics, Biology, Physics, Chemistry, and Genetics.
           </Text>
-          <TouchableOpacity style={styles.upgradeButton}>
+          <TouchableOpacity style={styles.upgradeButton}
+          onPress={() => router.push('/upgrade')}>
             <Text style={styles.upgradeButtonText}>Upgrade to VIP</Text>
           </TouchableOpacity>
         </View>

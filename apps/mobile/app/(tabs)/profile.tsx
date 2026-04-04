@@ -73,12 +73,15 @@ export default function ProfileScreen() {
       </View>
 
       {user.tier === 'FREE' && (
-        <TouchableOpacity style={styles.upgradeCard}>
-          <Text style={styles.upgradeTitle}>⭐ Upgrade to VIP</Text>
-          <Text style={styles.upgradeDesc}>
-            Unlock all subjects, exclusive story arcs, and more.
-          </Text>
-        </TouchableOpacity>
+        <TouchableOpacity
+  style={styles.upgradeCard}
+  onPress={() => router.push('/upgrade')}
+>
+  <Text style={styles.upgradeTitle}>⭐ Upgrade to VIP</Text>
+  <Text style={styles.upgradeDesc}>
+    Unlock all subjects, exclusive story arcs, and more.
+  </Text>
+</TouchableOpacity>
       )}
 
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
